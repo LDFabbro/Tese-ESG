@@ -1,0 +1,1733 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Avaliação de Teses ESG — Crédito ESG</title>
+
+<!-- SheetJS for Excel export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- html2canvas for screen capture -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<!-- PptxGenJS for PowerPoint assembly -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pptxgenjs/3.12.0/pptxgen.bundle.js"></script>
+
+<style>
+/* ── Fontes ─────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+/* ── Variáveis ──────────────────────────────────────────── */
+:root {
+  --orange:   #F06400;
+  --orange-l: #F5955A;
+  --orange-xl:#FFF0E6;
+  --black:    #1A1A1A;
+  --dark:     #2D2D2D;
+  --gray:     #5A5A5A;
+  --gray-l:   #A0A0A0;
+  --gray-xl:  #E8E8E8;
+  --bg:       #F5F5F3;
+  --white:    #FFFFFF;
+  --teal:     #006B6B;
+  --teal-l:   #E0F0F0;
+  --green:    #2E7D3B;
+  --green-l:  #E8F5EA;
+  --amber:    #E07000;
+  --amber-l:  #FFF8F0;
+  --red:      #CC3300;
+  --red-l:    #FFF5F3;
+  --radius:   10px;
+  --shadow:   0 2px 12px rgba(0,0,0,0.08);
+  --shadow-l: 0 4px 24px rgba(0,0,0,0.12);
+}
+
+/* ── Reset ──────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Sora', sans-serif;
+  background: var(--bg);
+  color: var(--dark);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ── Layout ─────────────────────────────────────────────── */
+.app { display: flex; flex-direction: column; min-height: 100vh; }
+
+/* ── Header ─────────────────────────────────────────────── */
+.header {
+  background: var(--black);
+  color: var(--white);
+  padding: 0 40px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 3px solid var(--orange);
+}
+.header-brand { display: flex; align-items: center; gap: 14px; }
+.header-dot {
+  width: 8px; height: 8px;
+  background: var(--orange);
+  border-radius: 50%;
+}
+.header-title { font-size: 13px; font-weight: 600; letter-spacing: 0.04em; color: var(--white); }
+.header-sub { font-size: 11px; color: var(--gray-l); letter-spacing: 0.02em; }
+.header-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--gray-l);
+  border: 1px solid #444;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+/* ── Progresso ──────────────────────────────────────────── */
+.progress-bar-wrap {
+  background: var(--dark);
+  height: 3px;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: var(--orange);
+  transition: width 0.5s cubic-bezier(.4,0,.2,1);
+}
+
+/* ── Conteúdo central ───────────────────────────────────── */
+.main { flex: 1; padding: 40px 0; }
+.container { max-width: 840px; margin: 0 auto; padding: 0 24px; }
+
+/* ── Telas (pages) ──────────────────────────────────────── */
+.page { display: none; animation: fadeIn 0.35s ease; }
+.page.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── Cabeçalho de seção ─────────────────────────────────── */
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--orange);
+  color: var(--white);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+.section-label.teal { background: var(--teal); }
+.section-label.red  { background: var(--red);  }
+
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--black);
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+.page-subtitle {
+  font-size: 13.5px;
+  color: var(--gray);
+  margin-bottom: 32px;
+  line-height: 1.5;
+}
+
+/* ── Cards ──────────────────────────────────────────────── */
+.card {
+  background: var(--white);
+  border-radius: var(--radius);
+  border: 1px solid var(--gray-xl);
+  box-shadow: var(--shadow);
+  padding: 28px;
+  margin-bottom: 20px;
+}
+.card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--orange);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-title::before {
+  content: '';
+  display: block;
+  width: 4px; height: 16px;
+  background: var(--orange);
+  border-radius: 2px;
+}
+.card-title.teal { color: var(--teal); }
+.card-title.teal::before { background: var(--teal); }
+
+/* ── Formulário ─────────────────────────────────────────── */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group.full { grid-column: 1 / -1; }
+label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--gray);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+input[type="text"], input[type="date"], select, textarea {
+  font-family: 'Sora', sans-serif;
+  font-size: 13.5px;
+  color: var(--dark);
+  background: var(--bg);
+  border: 1.5px solid var(--gray-xl);
+  border-radius: 8px;
+  padding: 10px 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--orange);
+  box-shadow: 0 0 0 3px rgba(240,100,0,0.12);
+  background: var(--white);
+}
+textarea { resize: vertical; min-height: 80px; }
+select { appearance: none; cursor: pointer; }
+
+/* ── Botões ─────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Sora', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 11px 24px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.btn-primary {
+  background: var(--orange);
+  color: var(--white);
+}
+.btn-primary:hover { background: #D45800; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(240,100,0,0.3); }
+.btn-secondary {
+  background: var(--white);
+  color: var(--dark);
+  border: 1.5px solid var(--gray-xl);
+}
+.btn-secondary:hover { border-color: var(--gray-l); background: var(--bg); }
+.btn-teal { background: var(--teal); color: var(--white); }
+.btn-teal:hover { background: #005555; transform: translateY(-1px); }
+.btn-green { background: var(--green); color: var(--white); }
+.btn-green:hover { background: #236B2E; transform: translateY(-1px); }
+.btn-sm { padding: 7px 16px; font-size: 12px; }
+.btn-icon { width: 36px; height: 36px; padding: 0; justify-content: center; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none !important; }
+
+.btn-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 32px;
+  gap: 12px;
+}
+
+/* ── Stepper ─────────────────────────────────────────────── */
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 32px;
+  background: var(--white);
+  border: 1px solid var(--gray-xl);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  overflow-x: auto;
+}
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.step-num {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700;
+  background: var(--gray-xl);
+  color: var(--gray-l);
+  transition: all 0.3s;
+}
+.step-num.done { background: var(--orange); color: var(--white); }
+.step-num.active { background: var(--orange); color: var(--white); box-shadow: 0 0 0 4px rgba(240,100,0,0.2); }
+.step-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--gray-l);
+  transition: color 0.3s;
+}
+.step-label.active { color: var(--orange); }
+.step-label.done { color: var(--dark); }
+.step-arrow {
+  color: var(--gray-xl);
+  font-size: 14px;
+  margin: 0 8px;
+  flex-shrink: 0;
+}
+
+/* ── Dimensões de avaliação ─────────────────────────────── */
+.dim-block {
+  border: 1.5px solid var(--gray-xl);
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 16px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background: var(--white);
+}
+.dim-block:hover { border-color: var(--orange-l); }
+.dim-block.rated { border-color: var(--orange); background: var(--orange-xl); }
+.dim-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+.dim-num {
+  width: 24px; height: 24px;
+  background: var(--orange);
+  color: var(--white);
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.dim-info { flex: 1; }
+.dim-title { font-size: 14px; font-weight: 700; color: var(--black); margin-bottom: 4px; }
+.dim-questions { font-size: 12.5px; color: var(--gray); line-height: 1.55; }
+.dim-questions li { margin-left: 14px; margin-bottom: 2px; }
+.dim-rating { display: flex; align-items: center; }
+
+/* ── Categorias ─────────────────────────────────────────── */
+.cat-group {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.cat-btn {
+  padding: 6px 13px;
+  border-radius: 20px;
+  border: 1.5px solid transparent;
+  font-family: 'Sora', sans-serif;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s;
+  background: var(--bg);
+  color: var(--gray);
+  border-color: var(--gray-xl);
+}
+.cat-btn:hover { transform: translateY(-1px); }
+.cat-btn.selected-insuf  { background: var(--red);    color: var(--white); border-color: var(--red);    box-shadow: 0 2px 8px rgba(204,51,0,0.3); }
+.cat-btn.selected-fraco  { background: var(--orange); color: var(--white); border-color: var(--orange); box-shadow: 0 2px 8px rgba(240,100,0,0.3); }
+.cat-btn.selected-mod    { background: var(--amber);  color: var(--white); border-color: var(--amber);  box-shadow: 0 2px 8px rgba(224,112,0,0.3); }
+.cat-btn.selected-bom    { background: var(--teal);   color: var(--white); border-color: var(--teal);   box-shadow: 0 2px 8px rgba(0,107,107,0.3); }
+.cat-btn.selected-excel  { background: var(--green);  color: var(--white); border-color: var(--green);  box-shadow: 0 2px 8px rgba(46,125,59,0.3); }
+
+.note-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px; height: 24px;
+  border-radius: 6px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 0 8px;
+}
+
+/* ── Critério 5 — Elegibilidade ─────────────────────────── */
+.elig-options { display: flex; gap: 12px; flex-direction: column; }
+.elig-btn {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 18px 20px;
+  border-radius: 10px;
+  border: 2px solid var(--gray-xl);
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--white);
+  text-align: left;
+  width: 100%;
+  font-family: 'Sora', sans-serif;
+}
+.elig-btn:hover { border-color: var(--gray-l); background: var(--bg); }
+.elig-btn.sel-green { border-color: var(--green); background: var(--green-l); }
+.elig-btn.sel-amber { border-color: var(--amber); background: var(--amber-l); }
+.elig-btn.sel-red   { border-color: var(--red);   background: var(--red-l);   }
+.elig-icon {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.elig-icon.green { background: var(--green); color: var(--white); }
+.elig-icon.amber { background: var(--amber); color: var(--white); }
+.elig-icon.red   { background: var(--red);   color: var(--white); }
+.elig-text-title { font-size: 13.5px; font-weight: 700; color: var(--black); margin-bottom: 3px; }
+.elig-text-desc  { font-size: 12px; color: var(--gray); line-height: 1.5; }
+
+/* ── Score parcial ──────────────────────────────────────── */
+.score-mini {
+  background: var(--black);
+  color: var(--white);
+  border-radius: 10px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.score-mini-label { font-size: 12px; color: var(--gray-l); }
+.score-mini-val {
+  font-family: 'DM Mono', monospace;
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--orange);
+}
+
+/* ── Tela de resumo ─────────────────────────────────────── */
+.result-hero {
+  background: var(--black);
+  border-radius: var(--radius);
+  padding: 36px;
+  text-align: center;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.result-hero::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: var(--orange);
+  opacity: 0.06;
+}
+.result-hero-label { font-size: 11px; font-weight: 700; color: var(--gray-l); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px; }
+.result-hero-score {
+  font-family: 'DM Mono', monospace;
+  font-size: 72px;
+  font-weight: 500;
+  color: var(--white);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.result-hero-band {
+  display: inline-block;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 6px 20px;
+  border-radius: 20px;
+  margin-bottom: 6px;
+}
+.result-hero-rec { font-size: 13px; color: var(--gray-l); }
+
+.result-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.result-crit-card {
+  background: var(--white);
+  border: 1px solid var(--gray-xl);
+  border-radius: 10px;
+  padding: 18px;
+  border-left: 4px solid var(--orange);
+}
+.result-crit-name { font-size: 11px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+.result-crit-score {
+  font-family: 'DM Mono', monospace;
+  font-size: 28px;
+  font-weight: 500;
+  color: var(--orange);
+}
+.result-crit-detail { font-size: 11.5px; color: var(--gray); margin-top: 4px; }
+
+.result-elig-badge {
+  border-radius: 10px;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.result-elig-badge.green { background: var(--green-l); border: 1.5px solid var(--green); }
+.result-elig-badge.amber { background: var(--amber-l); border: 1.5px solid var(--amber); }
+.result-elig-badge.red   { background: var(--red-l);   border: 1.5px solid var(--red);   }
+
+.export-row {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ── Bloqueado ──────────────────────────────────────────── */
+.blocked-screen {
+  text-align: center;
+  padding: 60px 20px;
+}
+.blocked-icon {
+  width: 80px; height: 80px;
+  background: var(--red-l);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px;
+  margin: 0 auto 20px;
+  border: 2px solid var(--red);
+}
+.blocked-title { font-size: 22px; font-weight: 700; color: var(--red); margin-bottom: 10px; }
+.blocked-desc { font-size: 14px; color: var(--gray); max-width: 480px; margin: 0 auto 28px; }
+
+/* ── Tooltips / notas ───────────────────────────────────── */
+.info-box {
+  background: var(--teal-l);
+  border-left: 3px solid var(--teal);
+  border-radius: 0 8px 8px 0;
+  padding: 12px 16px;
+  font-size: 12.5px;
+  color: var(--teal);
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+/* ── Footer ─────────────────────────────────────────────── */
+.footer {
+  background: var(--black);
+  color: var(--gray-l);
+  text-align: center;
+  padding: 16px;
+  font-size: 11px;
+  border-top: 2px solid var(--orange);
+}
+
+/* ── Loading spinner ─────────────────────────────────────── */
+.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Responsive ─────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .container { padding: 0 16px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .form-grid.cols-3 { grid-template-columns: 1fr; }
+  .result-grid { grid-template-columns: 1fr; }
+  .header { padding: 0 16px; }
+  .stepper { padding: 12px; gap: 0; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- Header -->
+<header class="header">
+  <div class="header-brand">
+    <div class="header-dot"></div>
+    <div>
+      <div class="header-title">Avaliação de Teses ESG</div>
+      <div class="header-sub">Crédito ESG</div>
+    </div>
+  </div>
+  <div class="header-badge">v3.0 · 2025</div>
+</header>
+<div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar" style="width:0%"></div></div>
+
+<!-- Main -->
+<main class="main">
+<div class="container">
+
+<!-- ══════════════════════════════════════════════
+     PÁGINA 0 — DADOS DA OPERAÇÃO
+══════════════════════════════════════════════ -->
+<div class="page active" id="page-0">
+  <div class="section-label">Nova Avaliação</div>
+  <h1 class="page-title">Dados da Operação</h1>
+  <p class="page-subtitle">Preencha as informações da emissão antes de iniciar a avaliação pelos critérios ESG.</p>
+
+  <div class="card">
+    <div class="card-title">Identificação do Emissor</div>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Nome do Cliente / Emissor *</label>
+        <input type="text" id="f-cliente" placeholder="Razão social do emissor">
+      </div>
+      <div class="form-group">
+        <label>Setor / Segmento *</label>
+        <select id="f-setor">
+          <option value="">Selecione</option>
+          <option>Agronegócio</option>
+          <option>Energia</option>
+          <option>Indústria</option>
+          <option>Papel & Celulose</option>
+          <option>Mineração</option>
+          <option>Saneamento & Infraestrutura</option>
+          <option>Serviços Financeiros</option>
+          <option>Varejo & Consumo</option>
+          <option>Saúde</option>
+          <option>Tecnologia</option>
+          <option>Transporte & Logística</option>
+          <option>Outro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Porte da Empresa</label>
+        <select id="f-porte">
+          <option value="">Selecione</option>
+          <option>Grande Empresa</option>
+          <option>Média Empresa</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Dados do Instrumento</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Tipo de Instrumento *</label>
+        <select id="f-tipo">
+          <option value="">Selecione</option>
+          <option>Green Bond</option>
+          <option>Social Bond</option>
+          <option>Sustainability Bond</option>
+          <option>Sustainability-Linked Bond (SLB)</option>
+          <option>Green Loan</option>
+          <option>Sustainability-Linked Loan (SLL)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Volume da Emissão *</label>
+        <input type="text" id="f-volume" placeholder="Ex: R$ 500 MM ou USD 250 MM">
+      </div>
+      <div class="form-group">
+        <label>Data da Emissão</label>
+        <input type="date" id="f-data">
+      </div>
+      <div class="form-group">
+        <label>Prazo / Vencimento</label>
+        <input type="text" id="f-prazo" placeholder="Ex: 5 anos / Jan 2030">
+      </div>
+      <div class="form-group">
+        <label>Agência de SPO</label>
+        <select id="f-spo">
+          <option value="">Selecione ou N/A</option>
+          <option>Sustainalytics</option>
+          <option>S&P Global Ratings</option>
+          <option>Moody's Ratings</option>
+          <option>ISS-Corporate</option>
+          <option>Sustainable Fitch</option>
+          <option>Outra</option>
+          <option>Não possui SPO</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Analista Responsável *</label>
+        <input type="text" id="f-analista" placeholder="Nome do analista">
+      </div>
+      <div class="form-group full">
+        <label>Tema / Objeto Principal da Emissão</label>
+        <input type="text" id="f-tema" placeholder="Ex: Eficiência energética e energia renovável">
+      </div>
+      <div class="form-group full">
+        <label>Observações Gerais (contexto adicional)</label>
+        <textarea id="f-obs" placeholder="Contexto da operação, histórico de emissões ESG do cliente, informações relevantes..." rows="3"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <div></div>
+    <button class="btn btn-primary" onclick="startEvaluation()">
+      Iniciar Avaliação
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     PÁGINAS 1–4 — CRITÉRIOS 1 A 4 (geradas por JS)
+══════════════════════════════════════════════ -->
+<div class="page" id="page-crit"></div>
+
+<!-- ══════════════════════════════════════════════
+     PÁGINA 5 — CRITÉRIO 5: ELEGIBILIDADE
+══════════════════════════════════════════════ -->
+<div class="page" id="page-elig">
+  <div id="stepper-elig"></div>
+  <div class="section-label red">Critério 5 — Elegibilidade</div>
+  <h1 class="page-title">Controvérsias & Risco de Greenwashing</h1>
+  <p class="page-subtitle">Critério qualitativo de elegibilidade — determina se a operação pode seguir para aprovação e em quais condições.</p>
+
+  <div class="info-box">
+    Este critério não gera nota numérica. O analista enquadra o emissor em uma das três categorias com base no histórico reputacional, regulatório e de consistência ESG. Controvérsias graves vetam a operação. Controvérsias médias permitem aprovação com alerta formal ao comitê.
+  </div>
+
+  <div class="card">
+    <div class="card-title red" style="color:var(--red)">
+      <span style="display:block;width:4px;height:16px;background:var(--red);border-radius:2px"></span>
+      Classificação de Elegibilidade
+    </div>
+    <div class="elig-options" id="elig-options">
+      <button class="elig-btn" onclick="selectElig('green',this)">
+        <div class="elig-icon green">✓</div>
+        <div>
+          <div class="elig-text-title">Sem Controvérsias Relevantes — Operação Elegível</div>
+          <div class="elig-text-desc">Empresa sem passivos socioambientais materiais não resolvidos, sem investigações regulatórias ativas e sem inconsistências estratégicas relevantes. Segue para avaliação quantitativa normalmente.</div>
+        </div>
+      </button>
+      <button class="elig-btn" onclick="selectElig('amber',this)">
+        <div class="elig-icon amber">!</div>
+        <div>
+          <div class="elig-text-title">Controvérsias Médias — Elegível com Alerta ao Comitê</div>
+          <div class="elig-text-desc">Empresa com controvérsias existentes mas de natureza gerenciável: passivos em negociação, investigações encerradas, inconsistências pontuais endereçadas. A operação pode ser aprovada, mas o comitê deve ser formalmente alertado.</div>
+        </div>
+      </button>
+      <button class="elig-btn" onclick="selectElig('red',this)">
+        <div class="elig-icon red">✗</div>
+        <div>
+          <div class="elig-text-title">Controvérsias Graves — Operação Não Elegível</div>
+          <div class="elig-text-desc">Empresa com passivos socioambientais graves e não resolvidos, investigações regulatórias ativas, padrão recorrente de descumprimento de compromissos ESG ou contradição estrutural entre core business e tema da emissão. Veto à aprovação.</div>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Justificativa e Evidências</div>
+    <div class="form-group">
+      <label>Racional detalhado da classificação *</label>
+      <textarea id="elig-comment" placeholder="Descreva as controvérsias identificadas, as fontes consultadas (RepRisk, Sustainalytics Controversy Monitor, mídia, reguladores), o contexto e a justificativa para a classificação escolhida..." rows="5"></textarea>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="goBack()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Voltar
+    </button>
+    <button class="btn btn-primary" onclick="submitElig()">
+      Ver Resultado
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     PÁGINA 6 — OPERAÇÃO BLOQUEADA
+══════════════════════════════════════════════ -->
+<div class="page" id="page-blocked">
+  <div class="blocked-screen">
+    <div class="blocked-icon">✗</div>
+    <div class="blocked-title">Operação Não Elegível</div>
+    <div class="blocked-desc">A presença de controvérsias graves impede a aprovação desta emissão ESG, independentemente do desempenho nos demais critérios. A operação foi vetada com base no Critério 5.</div>
+    <div style="margin-bottom:24px">
+      <div class="card" style="text-align:left;max-width:480px;margin:0 auto">
+        <div class="card-title" style="color:var(--red)"><span style="display:block;width:4px;height:16px;background:var(--red);border-radius:2px"></span>Justificativa registrada</div>
+        <p id="blocked-justif" style="font-size:13px;color:var(--gray);line-height:1.6"></p>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-secondary" onclick="goBack()">← Rever Classificação</button>
+      <button class="btn btn-primary" onclick="exportBlockedExcel()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        Exportar Registro (Excel)
+      </button>
+      <button class="btn btn-secondary" onclick="restartApp()">Nova Avaliação</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     PÁGINA 7 — RESULTADO FINAL
+══════════════════════════════════════════════ -->
+<div class="page" id="page-result">
+  <div class="section-label teal">Resultado Final</div>
+  <h1 class="page-title">Parecer da Avaliação</h1>
+  <p class="page-subtitle" id="result-subtitle"></p>
+
+  <div id="result-elig-badge"></div>
+  <div class="result-hero" id="result-hero"></div>
+
+  <div class="result-grid" id="result-grid"></div>
+
+  <div id="result-dims-detail"></div>
+
+  <div class="card">
+    <div class="card-title teal">Exportar Avaliação Completa</div>
+    <p style="font-size:13px;color:var(--gray);margin-bottom:20px;line-height:1.5">
+      Gere os arquivos com todos os dados da operação, classificações, notas e comentários preenchidos durante a avaliação. Os arquivos conterão todas as informações inseridas nesta sessão.
+    </p>
+    <div class="export-row">
+      <button class="btn btn-teal" onclick="exportExcel()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        Exportar Excel
+      </button>
+      <button class="btn btn-primary" onclick="exportPPTX()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        Exportar PowerPoint
+      </button>
+      <button class="btn btn-secondary" onclick="restartApp()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        Nova Avaliação
+      </button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /container -->
+</main>
+
+<footer class="footer">
+  Framework de Avaliação de Teses ESG · Crédito ESG · Uso interno · v3.0 · 2025
+</footer>
+</div><!-- /app -->
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// DADOS DO FRAMEWORK
+// ═══════════════════════════════════════════════════════════
+const CRITERIOS = [
+  {
+    id: 1,
+    label: "CRITÉRIO 1  |  PESO 35%",
+    title: "Adicionalidade",
+    subtitle: "Avalia se os recursos captados financiam atividades com impacto incremental real, além do que ocorreria sem a emissão",
+    peso: 0.35,
+    cor: "orange",
+    dims: [
+      {
+        title: "Incremental financeiro",
+        questions: [
+          "Os recursos financiam capex novo ou projetos não previstos no orçamento corrente da empresa?",
+          "Há evidência de que os projetos ou compromissos não seriam viabilizados sem a emissão?"
+        ]
+      },
+      {
+        title: "Incremental de impacto",
+        questions: [
+          "O resultado ESG seria o mesmo sem o instrumento — por obrigação regulatória, tendência já em curso ou decisão estratégica independente?",
+          "Existe diferença mensurável entre o cenário com e sem a emissão, além da renomeação de gastos existentes?"
+        ]
+      },
+      {
+        title: "Linha de base e metodologia de medição",
+        questions: [
+          "Existe uma situação de referência (baseline) claramente definida que permite medir o impacto ou a melhora gerada pela emissão?",
+          "A metodologia de cálculo da baseline é documentada, replicável e validada por terceiro independente?"
+        ]
+      }
+    ]
+  },
+  {
+    id: 2,
+    label: "CRITÉRIO 2  |  PESO 35%",
+    title: "Materialidade",
+    subtitle: "Avalia se os temas ESG endereçados pela emissão são relevantes para o setor e para a empresa",
+    peso: 0.35,
+    cor: "orange",
+    dims: [
+      {
+        title: "Coerência com risk drivers setoriais",
+        questions: [
+          "O tema da emissão é um dos principais riscos ESG identificados para o setor pela empresa e por analistas independentes?",
+          "O tema tem potencial de impactar financeiramente o negócio — via regulação, custo de capital, acesso a mercados ou reputação?"
+        ]
+      },
+      {
+        title: "Alinhamento com a matriz de materialidade da empresa",
+        questions: [
+          "A empresa publicou matriz de materialidade e o tema da emissão está entre os tópicos de maior relevância identificados?",
+          "A matriz foi construída com participação de stakeholders externos, conferindo legitimidade à priorização?"
+        ]
+      },
+      {
+        title: "Foco nas áreas de maior exposição",
+        questions: [
+          "A emissão endereça as operações, atividades ou elos da cadeia onde o impacto ESG é mais significativo — não as de menor exposição?",
+          "A escolha do tema e do escopo sugere intenção genuína de transformação, ou contorna deliberadamente as áreas de maior risco?"
+        ]
+      }
+    ]
+  },
+  {
+    id: 3,
+    label: "CRITÉRIO 3  |  PESO 15%  |  CRITÉRIO DIFERENCIAL",
+    title: "Ambição & Desafio Financeiro",
+    subtitle: "Avalia se as metas ESG são suficientemente ambiciosas e se o comprometimento de recursos é relevante frente ao porte da empresa",
+    peso: 0.15,
+    cor: "amber",
+    dims: [
+      {
+        title: "vs. Trajetória histórica (BAU)",
+        questions: [
+          "A meta ou o volume de investimento supera a tendência histórica da empresa nos últimos 3–5 anos?",
+          "O resultado esperado seria alcançado naturalmente sem o instrumento, como extensão do que já estava em curso?"
+        ]
+      },
+      {
+        title: "vs. Benchmark setorial e referências externas",
+        questions: [
+          "A meta ou o nível de investimento posiciona a empresa acima da média do setor ou próxima às líderes?",
+          "Existe referência a padrões externos reconhecidos — SBTi, GHG Protocol, TNFD ou benchmarks setoriais publicados?"
+        ]
+      },
+      {
+        title: "Relevância do comprometimento frente ao porte da empresa",
+        questions: [
+          "O volume de recursos captados e aplicado à agenda ESG é relevante frente ao faturamento, ao capex total ou à geração de caixa da empresa?",
+          "A parcela da operação destinada a temas genuinamente ESG é significativa, ou a emissão é predominantemente reaproveitamento de projetos já previstos?"
+        ]
+      }
+    ]
+  },
+  {
+    id: 4,
+    label: "CRITÉRIO 4  |  PESO 15%",
+    title: "Credibilidade, Governança & Alinhamento",
+    subtitle: "Avalia a robustez da gestão ESG corporativa, a qualidade do framework de emissão e a coerência com a estratégia de longo prazo",
+    peso: 0.15,
+    cor: "teal",
+    dims: [
+      {
+        title: "Credibilidade do framework e da SPO",
+        questions: [
+          "A SPO foi emitida por agência acreditada (Sustainalytics, S&P, Moody's, ISS, Fitch)?",
+          "O framework está atualizado e alinhado à versão vigente dos princípios ICMA?"
+        ]
+      },
+      {
+        title: "Governança e estrutura ESG corporativa",
+        questions: [
+          "Existe comitê ESG ativo com participação do board e metas formalizadas?",
+          "A remuneração variável de executivos é atrelada a KPIs ESG?"
+        ]
+      },
+      {
+        title: "Rastreabilidade e reporte",
+        questions: [
+          "Os recursos são segregados em conta vinculada ou virtual ring-fence auditado?",
+          "Existe reporte anual com KPIs quantitativos de impacto e verificação por terceiros?"
+        ]
+      },
+      {
+        title: "Alinhamento com estratégia de longo prazo",
+        questions: [
+          "A emissão integra um plano ESG de longo prazo aprovado pelo Conselho?",
+          "Há histórico de emissões ou compromissos ESG anteriores que demonstrem consistência?"
+        ]
+      }
+    ]
+  }
+];
+
+const CATS = [
+  { id: "insuf",  label: "Insuficiente", nota: 2,  cls: "selected-insuf", color: "#CC3300" },
+  { id: "fraco",  label: "Fraco",        nota: 5,  cls: "selected-fraco", color: "#F06400" },
+  { id: "mod",    label: "Moderado",     nota: 7,  cls: "selected-mod",   color: "#E07000" },
+  { id: "bom",    label: "Bom",          nota: 8,  cls: "selected-bom",   color: "#006B6B" },
+  { id: "excel",  label: "Excelente",    nota: 10, cls: "selected-excel", color: "#2E7D3B" },
+];
+
+const BANDS = [
+  { min: 8.5,  max: 10,  label: "EXCELENTE",              color: "#2E7D3B", bg: "#E8F5EA", rec: "Endosso integral — emissão referência de mercado." },
+  { min: 6.3,  max: 8.49,label: "ADEQUADO",               color: "#006B6B", bg: "#E0F0F0", rec: "Aprovação com monitoramento contínuo." },
+  { min: 3.8,  max: 6.29,label: "ACEITÁVEL COM RESSALVAS", color: "#E07000", bg: "#FFF8F0", rec: "Aprovação condicionada — solicitar melhorias." },
+  { min: 1.3,  max: 3.79,label: "INSUFICIENTE",           color: "#F06400", bg: "#FFF0E6", rec: "Não recomendar — solicitar revisão do framework." },
+  { min: 0,    max: 1.29,label: "NÃO RECOMENDADO",        color: "#CC3300", bg: "#FFF5F3", rec: "Recusar — risco material de greenwashing." },
+];
+
+// ═══════════════════════════════════════════════════════════
+// ESTADO
+// ═══════════════════════════════════════════════════════════
+let state = {
+  formData: {},
+  currentPage: 0,   // 0=form, 1-4=critérios, 5=elig, 6=blocked, 7=result
+  currentCrit: 0,   // índice 0-3 do critério atual
+  ratings: [        // [critIdx][dimIdx] = {cat, nota, comment}
+    [{},{},{}],
+    [{},{},{}],
+    [{},{},{}],
+    [{},{},{},{}],
+  ],
+  eligibility: { choice: null, comment: "" },
+};
+
+// ═══════════════════════════════════════════════════════════
+// NAVEGAÇÃO
+// ═══════════════════════════════════════════════════════════
+function showPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  updateProgress();
+}
+
+function updateProgress() {
+  const total = 7; // 0 a 7
+  const pct = (state.currentPage / total) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+}
+
+function goBack() {
+  if (state.currentPage === 5) {
+    // Elegibilidade → último critério
+    state.currentPage = 4;
+    state.currentCrit = 3;
+    renderCriterioPage(3);
+    showPage('page-crit');
+  } else if (state.currentPage >= 1 && state.currentPage <= 4) {
+    if (state.currentCrit === 0) {
+      state.currentPage = 0;
+      showPage('page-0');
+    } else {
+      state.currentCrit--;
+      state.currentPage = state.currentCrit + 1;
+      renderCriterioPage(state.currentCrit);
+      showPage('page-crit');
+    }
+  } else if (state.currentPage === 6) {
+    state.currentPage = 5;
+    showPage('page-elig');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// PÁGINA 0 — INÍCIO
+// ═══════════════════════════════════════════════════════════
+function startEvaluation() {
+  const cliente  = document.getElementById('f-cliente').value.trim();
+  const tipo     = document.getElementById('f-tipo').value;
+  const volume   = document.getElementById('f-volume').value.trim();
+  const analista = document.getElementById('f-analista').value.trim();
+
+  if (!cliente || !tipo || !volume || !analista) {
+    alert('Por favor, preencha os campos obrigatórios: Cliente, Tipo de Instrumento, Volume e Analista.');
+    return;
+  }
+
+  state.formData = {
+    cliente:  cliente,
+    setor:    document.getElementById('f-setor').value,
+    porte:    document.getElementById('f-porte').value,
+    tipo:     tipo,
+    volume:   volume,
+    data:     document.getElementById('f-data').value,
+    prazo:    document.getElementById('f-prazo').value,
+    spo:      document.getElementById('f-spo').value,
+    analista: analista,
+    tema:     document.getElementById('f-tema').value,
+    obs:      document.getElementById('f-obs').value,
+    dataAvaliacao: new Date().toLocaleDateString('pt-BR'),
+  };
+
+  state.currentCrit = 0;
+  state.currentPage = 1;
+  renderCriterioPage(0);
+  showPage('page-crit');
+}
+
+// ═══════════════════════════════════════════════════════════
+// STEPPER
+// ═══════════════════════════════════════════════════════════
+function buildStepper(currentCritIdx) {
+  const steps = ['Adicionalidade', 'Materialidade', 'Ambição', 'Credibilidade', 'Controvérsias'];
+  let html = '<div class="stepper">';
+  steps.forEach((s, i) => {
+    const done   = i < currentCritIdx;
+    const active = i === currentCritIdx;
+    const numCls = done ? 'done' : (active ? 'active' : '');
+    const lblCls = done ? 'done' : (active ? 'active' : '');
+    html += `<div class="step-item">
+      <div class="step-num ${numCls}">${done ? '✓' : (i+1)}</div>
+      <div class="step-label ${lblCls}">${s}</div>
+    </div>`;
+    if (i < steps.length - 1) html += '<span class="step-arrow">›</span>';
+  });
+  return html + '</div>';
+}
+
+// ═══════════════════════════════════════════════════════════
+// PÁGINAS DE CRITÉRIO
+// ═══════════════════════════════════════════════════════════
+function renderCriterioPage(critIdx) {
+  const crit = CRITERIOS[critIdx];
+  const saved = state.ratings[critIdx];
+  const accentColor = crit.cor === 'teal' ? 'var(--teal)' : (crit.cor === 'amber' ? 'var(--amber)' : 'var(--orange)');
+
+  // Score parcial
+  const completedCrits = state.ratings
+    .map((r, i) => ({r, i}))
+    .filter(({r}) => r.every(d => d.nota != null));
+  let scoreParcialHtml = '';
+  if (completedCrits.length > 0) {
+    const parcial = completedCrits.reduce((acc, {r, i}) => {
+      const avg = r.reduce((s, d) => s + (d.nota || 0), 0) / r.length;
+      return acc + avg * CRITERIOS[i].peso;
+    }, 0);
+    scoreParcialHtml = `<div class="score-mini">
+      <div>
+        <div class="score-mini-label">Score parcial (critérios avaliados)</div>
+        <div style="font-size:11px;color:var(--gray-l)">${completedCrits.length} de 4 critérios concluídos</div>
+      </div>
+      <div class="score-mini-val">${parcial.toFixed(2)}</div>
+    </div>`;
+  }
+
+  // Dimensões
+  let dimsHtml = '';
+  crit.dims.forEach((dim, di) => {
+    const sv = saved[di];
+    const isRated = sv && sv.nota != null;
+    const catLabel = sv && sv.cat ? CATS.find(c => c.id === sv.cat)?.label : '';
+    const nota = sv && sv.nota != null ? sv.nota : '';
+    const noteColor = sv && sv.cat ? CATS.find(c => c.id === sv.cat)?.color : '#999';
+    const comment = sv ? (sv.comment || '') : '';
+
+    let catBtnsHtml = CATS.map(cat => {
+      const isSelected = sv && sv.cat === cat.id;
+      return `<button class="cat-btn ${isSelected ? cat.cls : ''}" onclick="selectCat(${critIdx},${di},'${cat.id}',${cat.nota},this)">${cat.label}</button>`;
+    }).join('');
+
+    let questionsHtml = dim.questions.map(q => `<li>${q}</li>`).join('');
+
+    dimsHtml += `
+    <div class="dim-block ${isRated ? 'rated' : ''}" id="dim-${critIdx}-${di}">
+      <div class="dim-header">
+        <div class="dim-num">${di + 1}</div>
+        <div class="dim-info">
+          <div class="dim-title">${dim.title}</div>
+          <ul class="dim-questions">${questionsHtml}</ul>
+        </div>
+        <div class="dim-rating">
+          ${isRated ? `<span class="note-badge" style="background:${noteColor};color:#fff">${nota}</span>` : ''}
+        </div>
+      </div>
+      <div class="cat-group">${catBtnsHtml}</div>
+      <div class="form-group">
+        <label>Comentário / Racional (opcional)</label>
+        <textarea rows="2" placeholder="Descreva a evidência ou racional que sustenta esta classificação..." onchange="saveComment(${critIdx},${di},this.value)">${comment}</textarea>
+      </div>
+    </div>`;
+  });
+
+  const pillLabel = crit.cor === 'teal' ? 'section-label teal' : (crit.cor === 'amber' ? 'section-label' : 'section-label');
+  const isLast = critIdx === CRITERIOS.length - 1;
+
+  document.getElementById('page-crit').innerHTML = `
+    ${buildStepper(critIdx)}
+    ${scoreParcialHtml}
+    <div class="${pillLabel}" style="${crit.cor === 'amber' ? 'background:var(--amber)' : ''}">${crit.label}</div>
+    <h1 class="page-title">${crit.title}</h1>
+    <p class="page-subtitle">${crit.subtitle}</p>
+    <div class="card">
+      <div class="card-title" style="color:${accentColor}">
+        <span style="display:block;width:4px;height:16px;background:${accentColor};border-radius:2px"></span>
+        Avaliação por Dimensão
+      </div>
+      <div class="info-box">
+        Avalie cada dimensão individualmente selecionando a categoria que melhor descreve o desempenho da emissão. Em seguida, detalhe o racional no campo de comentário. A nota do critério será a média das dimensões.
+      </div>
+      ${dimsHtml}
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goBack()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Voltar
+      </button>
+      <button class="btn btn-primary" id="btn-next-crit" onclick="advanceCrit(${critIdx})">
+        ${isLast ? 'Ir para Controvérsias' : 'Próximo Critério'}
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+  `;
+}
+
+function selectCat(critIdx, dimIdx, catId, nota, btn) {
+  // Salvar
+  if (!state.ratings[critIdx][dimIdx]) state.ratings[critIdx][dimIdx] = {};
+  state.ratings[critIdx][dimIdx].cat = catId;
+  state.ratings[critIdx][dimIdx].nota = nota;
+
+  // UI — desmarcar todos e marcar o selecionado
+  const catCls = CATS.find(c => c.id === catId).cls;
+  const allCatBtns = btn.parentElement.querySelectorAll('.cat-btn');
+  allCatBtns.forEach(b => {
+    CATS.forEach(c => b.classList.remove(c.cls));
+  });
+  btn.classList.add(catCls);
+
+  // Badge de nota
+  const noteColor = CATS.find(c => c.id === catId).color;
+  const dimBlock = document.getElementById(`dim-${critIdx}-${dimIdx}`);
+  dimBlock.classList.add('rated');
+  const ratingDiv = dimBlock.querySelector('.dim-rating');
+  ratingDiv.innerHTML = `<span class="note-badge" style="background:${noteColor};color:#fff">${nota}</span>`;
+}
+
+function saveComment(critIdx, dimIdx, value) {
+  if (!state.ratings[critIdx][dimIdx]) state.ratings[critIdx][dimIdx] = {};
+  state.ratings[critIdx][dimIdx].comment = value;
+}
+
+function advanceCrit(critIdx) {
+  // Verificar se todas as dimensões foram avaliadas
+  const rated = state.ratings[critIdx].filter(d => d && d.nota != null).length;
+  if (rated < CRITERIOS[critIdx].dims.length) {
+    alert(`Por favor, avalie todas as ${CRITERIOS[critIdx].dims.length} dimensões antes de continuar.`);
+    return;
+  }
+
+  // Salvar comentários dos textareas
+  CRITERIOS[critIdx].dims.forEach((_, di) => {
+    const ta = document.querySelector(`#dim-${critIdx}-${di} textarea`);
+    if (ta && !state.ratings[critIdx][di]) state.ratings[critIdx][di] = {};
+    if (ta) state.ratings[critIdx][di].comment = ta.value;
+  });
+
+  if (critIdx < CRITERIOS.length - 1) {
+    state.currentCrit = critIdx + 1;
+    state.currentPage = critIdx + 2;
+    renderCriterioPage(critIdx + 1);
+    showPage('page-crit');
+  } else {
+    // Vai para elegibilidade
+    state.currentPage = 5;
+    document.getElementById('stepper-elig').innerHTML = buildStepper(4);
+    showPage('page-elig');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// ELEGIBILIDADE
+// ═══════════════════════════════════════════════════════════
+let eligSelected = null;
+
+function selectElig(choice, btn) {
+  eligSelected = choice;
+  document.querySelectorAll('.elig-btn').forEach(b => {
+    b.classList.remove('sel-green','sel-amber','sel-red');
+  });
+  btn.classList.add(`sel-${choice}`);
+}
+
+function submitElig() {
+  if (!eligSelected) {
+    alert('Por favor, selecione uma classificação de elegibilidade.');
+    return;
+  }
+  const comment = document.getElementById('elig-comment').value.trim();
+  if (!comment) {
+    alert('Por favor, preencha a justificativa da classificação de elegibilidade.');
+    return;
+  }
+
+  state.eligibility = { choice: eligSelected, comment };
+
+  if (eligSelected === 'red') {
+    state.currentPage = 6;
+    document.getElementById('blocked-justif').textContent = comment;
+    showPage('page-blocked');
+  } else {
+    state.currentPage = 7;
+    renderResult();
+    showPage('page-result');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// RESULTADO
+// ═══════════════════════════════════════════════════════════
+function calcScores() {
+  return CRITERIOS.map((crit, ci) => {
+    const r = state.ratings[ci];
+    const avg = r.reduce((s, d) => s + (d.nota || 0), 0) / r.length;
+    return { crit, avg, weighted: avg * crit.peso };
+  });
+}
+
+function getBand(score) {
+  return BANDS.find(b => score >= b.min && score <= b.max) || BANDS[BANDS.length-1];
+}
+
+function renderResult() {
+  const scores = calcScores();
+  const total  = scores.reduce((s, x) => s + x.weighted, 0);
+  const band   = getBand(total);
+  const fd     = state.formData;
+  const elig   = state.eligibility;
+
+  document.getElementById('result-subtitle').textContent =
+    `${fd.cliente} · ${fd.tipo} · ${fd.volume} · Analista: ${fd.analista} · ${fd.dataAvaliacao}`;
+
+  // Badge de elegibilidade
+  const eligMap = {
+    green: { cls: 'green', icon: '✓', label: 'Sem Controvérsias Relevantes — Operação Elegível' },
+    amber: { cls: 'amber', icon: '!', label: 'Controvérsias Médias — Elegível com Alerta ao Comitê' },
+  };
+  const em = eligMap[elig.choice];
+  document.getElementById('result-elig-badge').innerHTML = `
+    <div class="result-elig-badge ${em.cls}">
+      <div class="elig-icon ${em.cls}" style="width:32px;height:32px;font-size:14px">${em.icon}</div>
+      <div>
+        <div style="font-weight:700;font-size:13px;color:var(--dark)">${em.label}</div>
+        <div style="font-size:12px;color:var(--gray);margin-top:2px">${elig.comment.substring(0,120)}${elig.comment.length>120?'…':''}</div>
+      </div>
+    </div>`;
+
+  // Hero
+  document.getElementById('result-hero').innerHTML = `
+    <div class="result-hero-label">Score Final</div>
+    <div class="result-hero-score">${total.toFixed(2)}</div>
+    <div class="result-hero-band" style="background:${band.color};color:#fff">${band.label}</div>
+    <div class="result-hero-rec" style="margin-top:8px">${band.rec}</div>`;
+
+  // Grid de critérios
+  let gridHtml = '';
+  scores.forEach(({crit, avg, weighted}) => {
+    const b = getBand(avg);
+    gridHtml += `
+      <div class="result-crit-card" style="border-left-color:${b.color}">
+        <div class="result-crit-name">${crit.title}</div>
+        <div class="result-crit-score" style="color:${b.color}">${avg.toFixed(2)}</div>
+        <div class="result-crit-detail">${(crit.peso*100).toFixed(0)}% peso · contribuição ${weighted.toFixed(2)}</div>
+        <div style="margin-top:6px"><span style="background:${b.color};color:#fff;padding:2px 10px;border-radius:12px;font-size:10.5px;font-weight:700">${b.label}</span></div>
+      </div>`;
+  });
+  document.getElementById('result-grid').innerHTML = gridHtml;
+
+  // Detalhe por dimensão
+  let detailHtml = '<div class="card"><div class="card-title teal">Detalhe por Dimensão</div>';
+  scores.forEach(({crit}, ci) => {
+    detailHtml += `<div style="margin-bottom:20px"><div style="font-size:12px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">${crit.title}</div>`;
+    crit.dims.forEach((dim, di) => {
+      const r = state.ratings[ci][di];
+      const cat = r && r.cat ? CATS.find(c => c.id === r.cat) : null;
+      detailHtml += `
+        <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--gray-xl)">
+          <div style="min-width:80px">
+            ${cat ? `<span style="background:${cat.color};color:#fff;padding:3px 10px;border-radius:12px;font-size:10.5px;font-weight:700;white-space:nowrap">${cat.label} · ${cat.nota}</span>` : '<span style="color:var(--gray-l);font-size:11px">—</span>'}
+          </div>
+          <div style="flex:1">
+            <div style="font-size:12.5px;font-weight:600;color:var(--dark);margin-bottom:2px">${dim.title}</div>
+            ${r && r.comment ? `<div style="font-size:12px;color:var(--gray);font-style:italic">"${r.comment}"</div>` : ''}
+          </div>
+        </div>`;
+    });
+    detailHtml += '</div>';
+  });
+  detailHtml += '</div>';
+  document.getElementById('result-dims-detail').innerHTML = detailHtml;
+}
+
+// ═══════════════════════════════════════════════════════════
+// EXPORT EXCEL
+// ═══════════════════════════════════════════════════════════
+function buildWorkbook(includeScores = true) {
+  const wb   = XLSX.utils.book_new();
+  const fd   = state.formData;
+  const elig = state.eligibility;
+
+  /* ── Aba 1: Dados da Operação ── */
+  const abaOp = [
+    ["FRAMEWORK DE AVALIAÇÃO DE TESES ESG", "", "", ""],
+    ["Crédito ESG · v3.0 · 2025", "", "", ""],
+    ["", "", "", ""],
+    ["DADOS DA OPERAÇÃO", "", "", ""],
+    ["Cliente / Emissor", fd.cliente, "", ""],
+    ["Setor", fd.setor, "", ""],
+    ["Porte", fd.porte, "", ""],
+    ["Tipo de Instrumento", fd.tipo, "", ""],
+    ["Volume da Emissão", fd.volume, "", ""],
+    ["Data da Emissão", fd.data, "", ""],
+    ["Prazo / Vencimento", fd.prazo, "", ""],
+    ["Agência SPO", fd.spo, "", ""],
+    ["Analista Responsável", fd.analista, "", ""],
+    ["Tema / Objeto Principal", fd.tema, "", ""],
+    ["Data da Avaliação", fd.dataAvaliacao, "", ""],
+    ["Observações", fd.obs, "", ""],
+    ["", "", "", ""],
+    ["CRITÉRIO 5 — ELEGIBILIDADE", "", "", ""],
+    ["Classificação", elig.choice === 'green' ? 'Sem Controvérsias Relevantes' : elig.choice === 'amber' ? 'Controvérsias Médias — Alerta ao Comitê' : 'Controvérsias Graves — BLOQUEADO', "", ""],
+    ["Justificativa", elig.comment, "", ""],
+  ];
+  const ws1 = XLSX.utils.aoa_to_sheet(abaOp);
+  ws1['!cols'] = [{wch:30},{wch:60},{wch:15},{wch:15}];
+  XLSX.utils.book_append_sheet(wb, ws1, "Dados da Operação");
+
+  if (!includeScores) return wb;
+
+  /* ── Aba 2: Scorecard Completo ── */
+  const scores = calcScores();
+  const total  = scores.reduce((s, x) => s + x.weighted, 0);
+  const band   = getBand(total);
+
+  const rows = [
+    ["SCORECARD DE AVALIAÇÃO ESG", "", "", "", "", ""],
+    [`${fd.cliente} · ${fd.tipo} · ${fd.volume}`, "", "", "", "", ""],
+    ["", "", "", "", "", ""],
+    ["Critério", "Peso", "Dimensão", "Categoria", "Nota", "Comentário"],
+  ];
+  scores.forEach(({crit, avg}, ci) => {
+    crit.dims.forEach((dim, di) => {
+      const r = state.ratings[ci][di];
+      const cat = r && r.cat ? CATS.find(c => c.id === r.cat) : null;
+      rows.push([
+        di === 0 ? crit.title : "",
+        di === 0 ? `${(crit.peso*100).toFixed(0)}%` : "",
+        dim.title,
+        cat ? cat.label : "—",
+        cat ? cat.nota : "—",
+        r ? (r.comment || "") : "",
+      ]);
+    });
+    rows.push(["", "", `Nota ${crit.title}`, "Média", avg.toFixed(2), ""]);
+    rows.push(["", "", "", "", "", ""]);
+  });
+  rows.push(["SCORE FINAL", "", "", "", total.toFixed(2), `${band.label} — ${band.rec}`]);
+
+  const ws2 = XLSX.utils.aoa_to_sheet(rows);
+  ws2['!cols'] = [{wch:28},{wch:8},{wch:42},{wch:18},{wch:8},{wch:80}];
+  XLSX.utils.book_append_sheet(wb, ws2, "Scorecard");
+
+  /* ── Aba 3: Resumo Executivo ── */
+  const abaRes = [
+    ["RESUMO EXECUTIVO", "", ""],
+    [`Emitido por: ${fd.analista} · ${fd.dataAvaliacao}`, "", ""],
+    ["", "", ""],
+    ["Emissor", fd.cliente, ""],
+    ["Instrumento", fd.tipo, ""],
+    ["Volume", fd.volume, ""],
+    ["Setor", fd.setor, ""],
+    ["Elegibilidade", elig.choice === 'green' ? 'APROVADO' : elig.choice === 'amber' ? 'APROVADO COM ALERTA' : 'BLOQUEADO', ""],
+    ["", "", ""],
+    ["RESULTADO", "", ""],
+    ["Score Final", total.toFixed(2), ""],
+    ["Classificação", band.label, ""],
+    ["Recomendação", band.rec, ""],
+    ["", "", ""],
+    ["CRITÉRIOS", "Nota", "Peso"],
+    ...scores.map(({crit, avg}) => [crit.title, avg.toFixed(2), `${(crit.peso*100).toFixed(0)}%`]),
+  ];
+  const ws3 = XLSX.utils.aoa_to_sheet(abaRes);
+  ws3['!cols'] = [{wch:30},{wch:30},{wch:10}];
+  XLSX.utils.book_append_sheet(wb, ws3, "Resumo Executivo");
+
+  return wb;
+}
+
+function exportExcel() {
+  const wb  = buildWorkbook(true);
+  const fd  = state.formData;
+  const ts  = new Date().toISOString().slice(0,10);
+  XLSX.writeFile(wb, `Avaliacao_ESG_${fd.cliente.replace(/\s+/g,'_')}_${ts}.xlsx`);
+}
+
+function exportBlockedExcel() {
+  const wb = buildWorkbook(false);
+  const fd = state.formData;
+  const ts = new Date().toISOString().slice(0,10);
+  XLSX.writeFile(wb, `Avaliacao_ESG_BLOQUEADA_${fd.cliente.replace(/\s+/g,'_')}_${ts}.xlsx`);
+}
+
+// ═══════════════════════════════════════════════════════════
+// EXPORT PPTX — captura de telas via html2canvas
+// ═══════════════════════════════════════════════════════════
+
+// Captura um elemento como imagem base64
+async function captureEl(el, width = 1280) {
+  const canvas = await html2canvas(el, {
+    scale: 2,
+    useCORS: true,
+    allowTaint: true,
+    backgroundColor: null,
+    width: width,
+    scrollX: 0,
+    scrollY: 0,
+    windowWidth: width,
+  });
+  return canvas.toDataURL('image/png');
+}
+
+// Renderiza uma tela específica em um container oculto e captura
+async function capturePage(renderFn, bgColor = '#F5F5F3') {
+  const wrapper = document.getElementById('pptx-capture-layer');
+  wrapper.style.background = bgColor;
+  wrapper.innerHTML = '';
+
+  // Renderiza o conteúdo dentro do wrapper
+  renderFn(wrapper);
+
+  // Aguarda renderização
+  await new Promise(r => setTimeout(r, 120));
+
+  const img = await captureEl(wrapper, 1280);
+  wrapper.innerHTML = '';
+  return img;
+}
+
+// Gera HTML de uma tela de critério completa para captura
+function buildCritHTML(critIdx) {
+  const crit   = CRITERIOS[critIdx];
+  const saved  = state.ratings[critIdx];
+  const scores = calcScores();
+  const avg    = scores[critIdx].avg;
+  const band   = getBand(avg);
+  const accentColor = crit.cor === 'teal' ? '#006B6B' : crit.cor === 'amber' ? '#E07000' : '#F06400';
+
+  let dimsHtml = '';
+  crit.dims.forEach((dim, di) => {
+    const r   = saved[di] || {};
+    const cat = r.cat ? CATS.find(c => c.id === r.cat) : null;
+    dimsHtml += `
+      <div style="border:1.5px solid ${cat ? accentColor : '#E8E8E8'};border-radius:10px;padding:16px 18px;margin-bottom:12px;background:${cat ? '#FFF8F2' : '#fff'}">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <div style="width:22px;height:22px;background:${accentColor};border-radius:5px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex-shrink:0">${di+1}</div>
+          <div style="font-size:13.5px;font-weight:700;color:#1A1A1A;flex:1">${dim.title}</div>
+          ${cat ? `<span style="background:${cat.color};color:#fff;padding:3px 12px;border-radius:12px;font-size:11px;font-weight:700">${cat.label} · ${cat.nota}</span>` : ''}
+        </div>
+        ${r.comment ? `<div style="background:#F5F5F3;border-left:3px solid ${accentColor};padding:8px 12px;border-radius:0 6px 6px 0;font-size:12px;color:#5A5A5A;font-style:italic;margin-top:4px">"${r.comment}"</div>` : ''}
+      </div>`;
+  });
+
+  return `
+    <div style="padding:32px 40px;font-family:'Sora',sans-serif;background:#F5F5F3;min-height:100%">
+      <div style="display:inline-flex;align-items:center;background:${accentColor};color:#fff;font-size:10px;font-weight:700;letter-spacing:.08em;padding:4px 12px;border-radius:20px;margin-bottom:10px;text-transform:uppercase">${crit.label}</div>
+      <h1 style="font-size:26px;font-weight:700;color:#1A1A1A;margin:0 0 4px">${crit.title}</h1>
+      <p style="font-size:12.5px;color:#5A5A5A;margin:0 0 20px;font-style:italic">${crit.subtitle}</p>
+      <div style="background:#1A1A1A;border-radius:10px;padding:14px 20px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between">
+        <span style="color:#A0A0A0;font-size:12px">Nota do Critério</span>
+        <div style="display:flex;align-items:center;gap:12px">
+          <span style="font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:#F06400">${avg.toFixed(2)}</span>
+          <span style="background:${band.color};color:#fff;padding:3px 14px;border-radius:12px;font-size:11px;font-weight:700">${band.label}</span>
+        </div>
+      </div>
+      <div style="background:#fff;border-radius:10px;border:1px solid #E8E8E8;padding:22px 24px">
+        <div style="font-size:12px;font-weight:700;color:${accentColor};text-transform:uppercase;letter-spacing:.05em;margin-bottom:16px;display:flex;align-items:center;gap:8px">
+          <span style="display:block;width:4px;height:14px;background:${accentColor};border-radius:2px"></span>Avaliação por Dimensão
+        </div>
+        ${dimsHtml}
+      </div>
+    </div>`;
+}
+
+async function exportPPTX() {
+  const btn = document.querySelector('.btn-primary[onclick="exportPPTX()"]');
+  const origText = btn ? btn.innerHTML : '';
+  if (btn) btn.innerHTML = '<span class="spinner"></span> Gerando...';
+  if (btn) btn.disabled = true;
+
+  try {
+    const fd     = state.formData;
+    const elig   = state.eligibility;
+    const scores = calcScores();
+    const total  = scores.reduce((s, x) => s + x.weighted, 0);
+    const band   = getBand(total);
+
+    // ── Criar layer oculto para capturas ──────────────────
+    let layer = document.getElementById('pptx-capture-layer');
+    if (!layer) {
+      layer = document.createElement('div');
+      layer.id = 'pptx-capture-layer';
+      layer.style.cssText = `
+        position:fixed; top:-9999px; left:0;
+        width:1280px; min-height:720px;
+        overflow:hidden; z-index:-1;
+        font-family:'Sora',sans-serif;
+      `;
+      document.body.appendChild(layer);
+    }
+
+    const images = [];
+
+    // ── Tela 1: Dados da Operação ──────────────────────────
+    const img1 = await capturePage(el => {
+      el.innerHTML = `
+        <div style="padding:32px 40px;font-family:'Sora',sans-serif;background:#1A1A1A;min-height:720px">
+          <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:36px;max-width:720px">
+            <div style="font-size:10px;font-weight:700;color:#A0A0A0;letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px">Dados da Operação</div>
+            <h1 style="font-size:28px;font-weight:700;color:#F06400;margin:0 0 4px">${fd.cliente}</h1>
+            <p style="font-size:14px;color:#A0A0A0;margin:0 0 28px">${fd.tipo} · ${fd.volume}</p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              ${[
+                ['Setor', fd.setor], ['Porte', fd.porte],
+                ['Volume', fd.volume], ['Prazo', fd.prazo || '—'],
+                ['Agência SPO', fd.spo || '—'], ['Data da Emissão', fd.data || '—'],
+                ['Analista', fd.analista], ['Data da Avaliação', fd.dataAvaliacao],
+              ].map(([k,v]) => `
+                <div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:12px 16px">
+                  <div style="font-size:10px;font-weight:700;color:#F06400;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">${k}</div>
+                  <div style="font-size:13px;color:#FFFFFF;font-weight:500">${v || '—'}</div>
+                </div>`).join('')}
+            </div>
+            ${fd.tema ? `<div style="margin-top:16px;background:rgba(240,100,0,0.12);border:1px solid rgba(240,100,0,0.3);border-radius:8px;padding:14px 16px">
+              <div style="font-size:10px;font-weight:700;color:#F06400;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Tema / Objeto Principal</div>
+              <div style="font-size:13px;color:#E0E0E0">${fd.tema}</div>
+            </div>` : ''}
+            ${fd.obs ? `<div style="margin-top:12px;background:rgba(255,255,255,0.04);border-radius:8px;padding:14px 16px">
+              <div style="font-size:10px;font-weight:700;color:#A0A0A0;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Observações</div>
+              <div style="font-size:12px;color:#A0A0A0;font-style:italic">${fd.obs}</div>
+            </div>` : ''}
+          </div>
+        </div>`;
+    }, '#1A1A1A');
+    images.push({ img: img1, label: 'Dados da Operação' });
+
+    // ── Telas 2–5: Critérios ───────────────────────────────
+    for (let ci = 0; ci < CRITERIOS.length; ci++) {
+      const img = await capturePage(el => {
+        el.innerHTML = buildCritHTML(ci);
+      });
+      images.push({ img, label: CRITERIOS[ci].title });
+    }
+
+    // ── Tela 6: Elegibilidade ──────────────────────────────
+    const eligColors  = { green: '#2E7D3B', amber: '#E07000', red: '#CC3300' };
+    const eligLabels  = {
+      green: 'Sem Controvérsias Relevantes — Operação Elegível',
+      amber: 'Controvérsias Médias — Elegível com Alerta ao Comitê',
+      red:   'Controvérsias Graves — Operação Não Elegível',
+    };
+    const eligIcons   = { green: '✓', amber: '!', red: '✗' };
+    const ec          = eligColors[elig.choice];
+    const img6 = await capturePage(el => {
+      el.innerHTML = `
+        <div style="padding:32px 40px;font-family:'Sora',sans-serif;background:#F5F5F3">
+          <div style="display:inline-flex;align-items:center;background:#CC3300;color:#fff;font-size:10px;font-weight:700;letter-spacing:.08em;padding:4px 12px;border-radius:20px;margin-bottom:10px;text-transform:uppercase">CRITÉRIO 5 · ELEGIBILIDADE</div>
+          <h1 style="font-size:26px;font-weight:700;color:#1A1A1A;margin:0 0 4px">Controvérsias & Risco de Greenwashing</h1>
+          <p style="font-size:12.5px;color:#5A5A5A;margin:0 0 22px;font-style:italic">Critério qualitativo de elegibilidade</p>
+          <div style="display:flex;align-items:center;gap:16px;background:${ec}18;border:2px solid ${ec};border-radius:12px;padding:18px 22px;margin-bottom:20px">
+            <div style="width:44px;height:44px;background:${ec};border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:700;flex-shrink:0">${eligIcons[elig.choice]}</div>
+            <div style="font-size:15px;font-weight:700;color:#1A1A1A">${eligLabels[elig.choice]}</div>
+          </div>
+          <div style="background:#fff;border-radius:10px;border:1px solid #E8E8E8;padding:22px 24px">
+            <div style="font-size:12px;font-weight:700;color:#F06400;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Justificativa registrada</div>
+            <p style="font-size:13px;color:#2D2D2D;line-height:1.65;white-space:pre-wrap">${elig.comment}</p>
+          </div>
+        </div>`;
+    });
+    images.push({ img: img6, label: 'Controvérsias & Elegibilidade' });
+
+    // ── Tela 7: Resultado Final ────────────────────────────
+    const img7 = await capturePage(el => {
+      let critCards = scores.map(({crit, avg, weighted}) => {
+        const b = getBand(avg);
+        return `
+          <div style="background:rgba(255,255,255,0.07);border-radius:10px;border-left:4px solid ${b.color};padding:14px 18px">
+            <div style="font-size:10px;font-weight:700;color:#A0A0A0;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">${crit.title} · ${(crit.peso*100).toFixed(0)}%</div>
+            <div style="font-family:'DM Mono',monospace;font-size:26px;font-weight:500;color:${b.color}">${avg.toFixed(2)}</div>
+            <div style="font-size:11px;font-weight:700;color:${b.color};margin-top:4px">${b.label}</div>
+          </div>`;
+      }).join('');
+      el.innerHTML = `
+        <div style="padding:32px 40px;font-family:'Sora',sans-serif;background:#1A1A1A;min-height:720px">
+          <div style="display:grid;grid-template-columns:auto 1fr;gap:32px;align-items:start">
+            <div style="background:${band.color};border-radius:16px;padding:28px 32px;text-align:center;min-width:200px">
+              <div style="font-size:11px;color:rgba(255,255,255,0.7);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">Score Final</div>
+              <div style="font-family:'DM Mono',monospace;font-size:64px;font-weight:500;color:#fff;line-height:1">${total.toFixed(2)}</div>
+              <div style="font-size:12px;font-weight:700;color:#fff;margin-top:10px;padding:5px 14px;background:rgba(0,0,0,0.2);border-radius:20px">${band.label}</div>
+              <div style="font-size:11px;color:rgba(255,255,255,0.8);margin-top:10px;line-height:1.4">${band.rec}</div>
+            </div>
+            <div>
+              <div style="font-size:10px;font-weight:700;color:#A0A0A0;letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px">Resultado por Critério</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">${critCards}</div>
+              <div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:14px 18px;border-left:4px solid ${eligColors[elig.choice]}">
+                <div style="font-size:10px;font-weight:700;color:#A0A0A0;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">Elegibilidade (Critério 5)</div>
+                <div style="font-size:13px;font-weight:700;color:${eligColors[elig.choice]}">${eligLabels[elig.choice]}</div>
+              </div>
+            </div>
+          </div>
+        </div>`;
+    }, '#1A1A1A');
+    images.push({ img: img7, label: 'Resultado Final' });
+
+    // ── Montar PPTX ────────────────────────────────────────
+    const pres = new PptxGenJS();
+    pres.layout = 'LAYOUT_16x9';
+
+    images.forEach(({img, label}, idx) => {
+      const s = pres.addSlide();
+      // Imagem ocupa o slide inteiro
+      s.addImage({ data: img, x: 0, y: 0, w: 10, h: 5.625 });
+      // Rodapé mínimo com número de slide
+      s.addShape('rect', { x: 0, y: 5.35, w: 10, h: 0.275, fill: { color: 'F06400' }, line: { color: 'F06400' } });
+      s.addText(`${fd.cliente}  ·  ${fd.tipo}  ·  Crédito ESG`, {
+        x: 0.3, y: 5.36, w: 8.5, h: 0.25,
+        fontSize: 9, color: 'FFFFFF', fontFace: 'Calibri', valign: 'middle', margin: 0,
+      });
+      s.addText(`${idx + 1} / ${images.length}`, {
+        x: 9.0, y: 5.36, w: 0.7, h: 0.25,
+        fontSize: 9, color: 'FFFFFF', fontFace: 'Calibri', align: 'right', valign: 'middle', margin: 0,
+      });
+    });
+
+    const ts = new Date().toISOString().slice(0, 10);
+    await pres.writeFile({ fileName: `Avaliacao_ESG_${fd.cliente.replace(/\s+/g, '_')}_${ts}.pptx` });
+
+  } finally {
+    if (btn) { btn.innerHTML = origText; btn.disabled = false; }
+    const layer = document.getElementById('pptx-capture-layer');
+    if (layer) layer.innerHTML = '';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// REINICIAR
+// ═══════════════════════════════════════════════════════════
+function restartApp() {
+  if (!confirm('Iniciar uma nova avaliação? Os dados desta sessão serão perdidos.')) return;
+  state = {
+    formData: {},
+    currentPage: 0,
+    currentCrit: 0,
+    ratings: [[{},{},{}],[{},{},{}],[{},{},{}],[{},{},{},{}]],
+    eligibility: {choice:null,comment:""},
+  };
+  eligSelected = null;
+  document.getElementById('elig-comment').value = '';
+  document.querySelectorAll('.elig-btn').forEach(b => b.classList.remove('sel-green','sel-amber','sel-red'));
+  // Limpar formulário
+  ['f-cliente','f-volume','f-prazo','f-analista','f-tema','f-obs'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.value = '';
+  });
+  ['f-setor','f-tipo','f-spo','f-porte'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.value = '';
+  });
+  document.getElementById('f-data').value = '';
+  showPage('page-0');
+}
+</script>
+</body>
+</html>
